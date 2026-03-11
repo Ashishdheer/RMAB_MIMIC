@@ -1,63 +1,54 @@
-# Dynamic Treatment Plan Optimization using Restless Multi-Armed Bandits (RMAB) 🧠⚕️
+# Dynamic Treatment Plan Optimization using Restless Multi-Armed Bandits (RMAB)
 
-> **Anonymous implementation for double-blind review**
-
-This repository provides the implementation and artifacts used for evaluating **dynamic treatment allocation policies** using a **Restless Multi-Armed Bandit (RMAB)** framework.
-
-The goal is to learn treatment strategies from historical patient trajectories and evaluate them safely using **Off-Policy Evaluation (OPE)** before real-world deployment.
+This repository contains the implementation used for studying **dynamic treatment allocation using a Restless Multi-Armed Bandit (RMAB) framework**.
+The objective is to learn treatment strategies from historical patient trajectories and evaluate them safely using **off-policy evaluation techniques**.
 
 ---
 
-# 🔍 Overview
+## Overview
 
-Healthcare systems often need to decide **which patients should receive treatment when resources are limited**.
+In many healthcare settings, clinicians must decide **which patients should receive intervention when resources are limited**.
+This work models patients as arms in a **Restless Multi-Armed Bandit**, where each patient’s health state evolves over time.
 
-In this project:
+Using historical ICU data, the framework:
 
-* Each patient is modeled as an **arm in a Restless Multi-Armed Bandit**
-* Patient health states evolve over time
-* Treatment decisions are learned from historical trajectories
-* Policies are evaluated offline using statistical OPE methods
+* constructs longitudinal patient trajectories
+* learns value functions for treatment actions
+* builds a treatment policy
+* evaluates the policy using off-policy evaluation methods before any real-world deployment
 
-Pipeline:
-
-1. Patient trajectory construction
-2. Feature engineering and reward modelling
-3. Policy learning using RMAB formulation
-4. Policy bundle construction
-5. Off-policy evaluation using historical data
+This allows treatment strategies to be studied **without directly testing them on patients**.
 
 ---
 
-# 🧠 Methodology
+## Methodology
 
-The framework consists of three major components.
+The implementation follows three main stages.
 
-### 1. Trajectory Construction
+### 1. Patient Trajectory Construction
 
-Patient trajectories are built from longitudinal ICU records where each timestep represents a clinical state.
+Clinical records are converted into **time-ordered patient trajectories** where each timestep represents a patient state and the corresponding clinical intervention.
 
 ### 2. Policy Learning
 
-Action-value models are trained to estimate the expected long-term benefit of treatment decisions.
-
-These models are combined to form a **policy bundle** representing the treatment allocation strategy.
+Action-value models are trained to estimate the expected long-term impact of treatment decisions.
+These models are combined into a policy that determines **which patients should receive treatment at each timestep**.
 
 ### 3. Off-Policy Evaluation
 
-Policies are evaluated using historical data through:
+The learned policy is evaluated using historical data through:
 
-* **Weighted Importance Sampling (WIS)**
-* **Effective Sample Size (ESS)**
-* **Bootstrap confidence intervals**
+* Weighted Importance Sampling (WIS)
+* Effective Sample Size (ESS)
+* Bootstrap confidence intervals
 
-This allows reliable estimation of policy performance **without deploying the policy in a real clinical environment**.
+These methods estimate policy performance **without deploying the policy in practice**.
 
 ---
 
-# 📁 Repository Structure
+## Repository Structure
 
-```text
+```
 .
 ├── improved_rmab_policy.py
 ├── crmab_modelling.py
@@ -68,114 +59,102 @@ This allows reliable estimation of policy performance **without deploying the po
 └── README.md
 ```
 
-### File Descriptions
-
 **improved_rmab_policy.py**
-
-Implements RMAB policy utilities, trajectory analysis, and importance weight calculations.
+Implements policy evaluation utilities and importance-weight calculations.
 
 **crmab_modelling.py**
-
-Handles preprocessing, feature construction, behaviour policy modelling, and Q-model training.
+Handles preprocessing, feature construction, behavior policy modelling, and Q-model training.
 
 **crmab.py**
-
-Contains utilities for trajectory generation and RMAB state transitions.
+Provides utilities for constructing patient trajectories and RMAB state transitions.
 
 **ope_testing.py**
-
-Runs off-policy evaluation experiments and generates evaluation diagnostics.
+Runs the off-policy evaluation experiments and produces evaluation metrics.
 
 **policy_bundle.pkl**
-
-Serialized artifact containing trained models, feature definitions, and policy metadata.
+Serialized artifact containing trained models and policy metadata used during evaluation.
 
 ---
 
-# ⚙️ Installation
+## Installation
 
-Create a Python environment and install dependencies.
+Install the required Python packages:
 
-```bash
+```
 pip install -r requirements.txt
 ```
 
 ---
 
-# 🚀 Running Policy Evaluation
+## Running Policy Evaluation
 
-To evaluate the learned policy using the provided policy bundle:
+To evaluate the learned treatment policy using the provided artifacts:
 
-```bash
+```
 python ope_testing.py
 ```
 
-The script computes policy value estimates and produces evaluation diagnostics.
+The script computes policy value estimates and produces diagnostic metrics used in the analysis.
 
 ---
 
-# 📊 Output Metrics
+## Output Metrics
 
-Running the evaluation pipeline produces:
+The evaluation pipeline produces:
 
-* Estimated policy value
-* Effective Sample Size (ESS)
-* Trajectory-level diagnostics
-* Bootstrap confidence intervals
+* estimated policy value
+* effective sample size (ESS)
+* trajectory-level diagnostics
+* bootstrap confidence intervals
 
-These metrics help analyze **policy reliability and robustness**.
+These metrics help assess the **stability and reliability of the learned policy**.
 
 ---
 
-# 📊 Dataset
+## Dataset
 
 This project uses the **MIMIC-III Clinical Database (v1.4)**.
 
-MIMIC-III (Medical Information Mart for Intensive Care) is a publicly available dataset containing **de-identified electronic health records from intensive care unit patients** collected at Beth Israel Deaconess Medical Center between **2001 and 2012**.
+MIMIC-III (Medical Information Mart for Intensive Care) is a publicly available dataset containing **de-identified electronic health records of ICU patients** collected at Beth Israel Deaconess Medical Center between **2001 and 2012**.
 
-The dataset contains information for **over 40,000 patients and around 60,000 ICU admissions**.
+The dataset includes records for more than **40,000 patients and roughly 60,000 ICU stays**.
 
-Data modalities include:
+Available data types include:
 
-* Patient demographics
-* Vital sign measurements
-* Laboratory test results
-* Medications and treatment events
-* Clinical procedures
-* Diagnostic codes (ICD-9)
-* Fluid balance records
-* Clinical notes
-* Hospital outcomes
+* demographics
+* vital signs
+* laboratory measurements
+* medications and procedures
+* diagnostic codes
+* clinical notes
+* hospital outcomes
 
 Dataset access:
 
 https://physionet.org/content/mimiciii/1.4/
 
----
-
-# 🔐 Dataset Access Requirements
+### Access Requirements
 
 Access to the dataset requires:
 
-1. Completion of the **CITI “Data or Specimens Only Research” training**
-2. Signing the **PhysioNet Data Use Agreement**
-3. Credential approval through PhysioNet
+1. completing the **CITI data research training**
+2. signing the **PhysioNet data use agreement**
+3. obtaining credentialed access through PhysioNet
 
 ---
 
-# 🔁 Reproducibility
+## Reproducibility
 
-This repository provides:
+The repository provides the code used for:
 
-* RMAB treatment allocation implementation
-* Policy learning pipeline
-* Off-policy evaluation scripts
-* Precomputed policy bundle artifact
+* trajectory construction
+* policy learning
+* off-policy evaluation
 
-These components enable **reproducible policy evaluation experiments**.
+A precomputed `policy_bundle.pkl` artifact is included so that the evaluation pipeline can be reproduced.
 
 ---
 
-# 📄 License
+## License
 
 This repository is released for **research and reproducibility purposes**.
