@@ -1,54 +1,63 @@
-# Dynamic Treatment Plan Optimization using Restless Multi-Armed Bandits (RMAB)
+# Dynamic Treatment Plan Optimization using Restless Multi-Armed Bandits (RMAB) 🧠⚕️
 
 > **Anonymous implementation for double-blind review**
 
-This repository contains the implementation of a **Restless Multi-Armed Bandit (RMAB)** framework for **dynamic treatment planning in chronic disease management**. The system learns treatment policies from historical patient trajectories and evaluates them safely using **Off-Policy Evaluation (OPE)** methods before deployment.
+This repository provides the implementation and artifacts used for evaluating **dynamic treatment allocation policies** using a **Restless Multi-Armed Bandit (RMAB)** framework.
+
+The goal is to learn treatment strategies from historical patient trajectories and evaluate them safely using **Off-Policy Evaluation (OPE)** before real-world deployment.
 
 ---
 
-## Overview
+# 🔍 Overview
 
-Healthcare decision systems often need to decide **which patients should receive treatment at each time step when resources are limited**.
-This work models patients as **arms in a Restless Multi-Armed Bandit**, where each patient's health state evolves over time.
+Healthcare systems often need to decide **which patients should receive treatment when resources are limited**.
 
-The proposed framework:
+In this project:
 
-1. Constructs longitudinal patient trajectories
-2. Defines reward signals based on clinical outcomes
-3. Learns value functions for treatment actions
-4. Builds a policy bundle representing the learned treatment strategy
-5. Evaluates the policy using robust off-policy evaluation techniques
+* Each patient is modeled as an **arm in a Restless Multi-Armed Bandit**
+* Patient health states evolve over time
+* Treatment decisions are learned from historical trajectories
+* Policies are evaluated offline using statistical OPE methods
 
-This approach allows **safe evaluation of treatment strategies using observational healthcare data**.
+Pipeline:
 
----
-
-## Key Components
-
-### RMAB Treatment Allocation
-
-Each patient is modeled as an independent arm whose state evolves over time.
-At every timestep the system decides **which subset of patients should receive intervention**.
-
-### Policy Learning
-
-The framework learns action-value functions (Q-models) that estimate the long-term impact of treatment decisions.
-
-### Off-Policy Evaluation
-
-Before applying a policy in practice, its performance is estimated using historical data via:
-
-* Weighted Importance Sampling (WIS)
-* Effective Sample Size (ESS)
-* Bootstrap confidence intervals
-
-These methods allow **reliable evaluation without deploying the policy in real clinical environments**.
+1. Patient trajectory construction
+2. Feature engineering and reward modelling
+3. Policy learning using RMAB formulation
+4. Policy bundle construction
+5. Off-policy evaluation using historical data
 
 ---
 
-## Repository Structure
+# 🧠 Methodology
 
-```
+The framework consists of three major components.
+
+### 1. Trajectory Construction
+
+Patient trajectories are built from longitudinal ICU records where each timestep represents a clinical state.
+
+### 2. Policy Learning
+
+Action-value models are trained to estimate the expected long-term benefit of treatment decisions.
+
+These models are combined to form a **policy bundle** representing the treatment allocation strategy.
+
+### 3. Off-Policy Evaluation
+
+Policies are evaluated using historical data through:
+
+* **Weighted Importance Sampling (WIS)**
+* **Effective Sample Size (ESS)**
+* **Bootstrap confidence intervals**
+
+This allows reliable estimation of policy performance **without deploying the policy in a real clinical environment**.
+
+---
+
+# 📁 Repository Structure
+
+```text
 .
 ├── improved_rmab_policy.py
 ├── crmab_modelling.py
@@ -62,79 +71,111 @@ These methods allow **reliable evaluation without deploying the policy in real c
 ### File Descriptions
 
 **improved_rmab_policy.py**
-Implements policy evaluation utilities, trajectory analysis, and importance-weight calculations.
+
+Implements RMAB policy utilities, trajectory analysis, and importance weight calculations.
 
 **crmab_modelling.py**
-Handles preprocessing, feature construction, behavior policy modelling, and Q-model training.
+
+Handles preprocessing, feature construction, behaviour policy modelling, and Q-model training.
 
 **crmab.py**
-Provides utilities for trajectory generation and RMAB state transition handling.
+
+Contains utilities for trajectory generation and RMAB state transitions.
 
 **ope_testing.py**
-Runs off-policy evaluation experiments and produces diagnostics for policy performance.
+
+Runs off-policy evaluation experiments and generates evaluation diagnostics.
 
 **policy_bundle.pkl**
+
 Serialized artifact containing trained models, feature definitions, and policy metadata.
 
 ---
 
-## Installation
+# ⚙️ Installation
 
 Create a Python environment and install dependencies.
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
 ---
 
-## Running Off-Policy Evaluation
+# 🚀 Running Policy Evaluation
 
-To evaluate the learned policy using the provided bundle:
+To evaluate the learned policy using the provided policy bundle:
 
-```
+```bash
 python ope_testing.py
 ```
 
-This script computes policy value estimates and evaluation diagnostics.
+The script computes policy value estimates and produces evaluation diagnostics.
 
 ---
 
-## Outputs
+# 📊 Output Metrics
 
-Running the evaluation scripts produces:
+Running the evaluation pipeline produces:
 
 * Estimated policy value
 * Effective Sample Size (ESS)
 * Trajectory-level diagnostics
 * Bootstrap confidence intervals
 
-These metrics help assess **policy reliability and robustness**.
+These metrics help analyze **policy reliability and robustness**.
 
 ---
 
-## Reproducibility
+# 📊 Dataset
+
+This project uses the **MIMIC-III Clinical Database (v1.4)**.
+
+MIMIC-III (Medical Information Mart for Intensive Care) is a publicly available dataset containing **de-identified electronic health records from intensive care unit patients** collected at Beth Israel Deaconess Medical Center between **2001 and 2012**.
+
+The dataset contains information for **over 40,000 patients and around 60,000 ICU admissions**.
+
+Data modalities include:
+
+* Patient demographics
+* Vital sign measurements
+* Laboratory test results
+* Medications and treatment events
+* Clinical procedures
+* Diagnostic codes (ICD-9)
+* Fluid balance records
+* Clinical notes
+* Hospital outcomes
+
+Dataset access:
+
+https://physionet.org/content/mimiciii/1.4/
+
+---
+
+# 🔐 Dataset Access Requirements
+
+Access to the dataset requires:
+
+1. Completion of the **CITI “Data or Specimens Only Research” training**
+2. Signing the **PhysioNet Data Use Agreement**
+3. Credential approval through PhysioNet
+
+---
+
+# 🔁 Reproducibility
 
 This repository provides:
 
-* Implementation of the RMAB treatment allocation framework
+* RMAB treatment allocation implementation
 * Policy learning pipeline
-* Off-policy evaluation code
+* Off-policy evaluation scripts
 * Precomputed policy bundle artifact
 
-Together these components enable **reproducible policy evaluation experiments**.
+These components enable **reproducible policy evaluation experiments**.
 
 ---
 
-## Dataset
+# 📄 License
 
-The experiments rely on a clinical dataset derived from critical care patient records.
-
-Due to dataset access restrictions, the raw dataset is not included in this repository.
-Users should obtain the dataset through the appropriate access process and preprocess it using the provided scripts.
-
----
-
-## License
-
-This repository is provided for **research and reproducibility purposes**.
+This repository is released for **research and reproducibility purposes**.
