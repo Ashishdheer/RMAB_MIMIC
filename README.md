@@ -1,4 +1,4 @@
-# Dynamic Treatment Plan Optimization using Restless Multi-Armed Bandits (RMAB) 🧠⚕️
+# Dynamic Treatment Plan Optimization using Restless Multi-Armed Bandits (RMAB)
 
 This repository contains the implementation used to study **dynamic treatment allocation using a Restless Multi-Armed Bandit (RMAB) framework**.
 The goal is to learn treatment strategies from historical patient trajectories and evaluate them safely using **off-policy evaluation (OPE)** techniques.
@@ -51,94 +51,146 @@ These methods estimate policy performance **without deploying the policy in prac
 
 ```text
 .
-├── code
-│   ├── crmab_modelling.py
-│   ├── crmab.py
-│   ├── improved_rmab_policy.py
-│   └── ope_testing.py
-│
-├── data
-│   └── final_traj_clean_training_heart_v2_sorted_imputed.csv
-│
-├── models
-│   ├── policy_bundle.pkl
-│   ├── q_models_fqe_strong.pkl
-│   ├── behavior_model_lgbm.pkl
-│   └── behavior_model_lgbm_statecols.pkl
-│
-├── outputs
-│   ├── ope_crossfit_results.csv
-│   ├── ope_crossfit_summary.json
-│   ├── policy_mix_grid_wis_TUNE.csv
-│   └── policy_mix_selected_summary.json
-│
-├── notebooks
-│   ├── CRMAB.ipynb
-│   └── OPE_Testing.ipynb
-│
-├── scripts
-│   ├── reproduce_ope.sh
-│   └── build_sequences_from_csv.py
-│
-├── requirements.txt
+├── CRMAB.ipynb
+├── OPE_Testing.ipynb
+├── crmab_modelling.py
+├── improved_rmab_policy.py
+├── final_traj_clean_training_heart_v2_sorted_imputed.csv
+├── policy_bundle.pkl
+├── requirements
 └── README.md
 ```
+
+### File Descriptions
+
+**CRMAB.ipynb**
+
+Notebook used for constructing patient trajectories and preparing the RMAB training pipeline.
+
+**OPE_Testing.ipynb**
+
+Notebook used to perform off-policy evaluation experiments and analyze the learned policy.
+
+**crmab_modelling.py**
+
+Contains the implementation for data preprocessing, trajectory generation, feature construction, and policy learning.
+
+**improved_rmab_policy.py**
+
+Implements utilities used for evaluating the RMAB policy and computing importance weights.
+
+**policy_bundle.pkl**
+
+Serialized artifact containing the trained policy and model components used for evaluation.
+
+**final_traj_clean_training_heart_v2_sorted_imputed.csv**
+
+Processed dataset used to construct patient trajectories for training and evaluation.
+
+**requirements**
+
+List of Python dependencies required to run the project.
 
 ---
 
 # Installation
 
-Install the required Python packages.
+Install the required Python packages:
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements
 ```
 
 ---
 
-# Quick Reproduction
+# Running the Experiments
 
-After installing dependencies, the full evaluation pipeline can be reproduced with:
+The experimental pipeline consists of four main stages: trajectory construction, model training, policy evaluation, and policy refinement.  
+The steps below follow the same workflow used in our experiments.
 
-```bash
-bash scripts/reproduce_ope.sh
+### Step 1: Data Preparation and Trajectory Construction
+
+First, construct the patient trajectories from the processed ICU dataset.
+
+Open and run the notebook:
+
+```
+CRMAB.ipynb
 ```
 
-This script will:
+This notebook:
 
-* load the trained policy bundle
-* run the off-policy evaluation pipeline
-* generate evaluation results and diagnostic outputs
+- loads the processed patient dataset  
+- filters the required heart patient cohort  
+- constructs time-ordered patient trajectories  
+- prepares the data required for RMAB model training  
+
+The output of this step is a structured trajectory dataset used for training the RMAB model.
 
 ---
 
-# Running Policy Evaluation Manually
+### Step 2: RMAB Model Training
 
-You can also run the evaluation script directly:
+After trajectories are prepared, train the RMAB model using:
 
-```bash
-python ope_testing.py
+```
+python crmab_modelling.py
 ```
 
-Results will be written to the **outputs** directory.
+This script:
+
+- performs feature processing  
+- trains the action-value models  
+- learns the RMAB treatment policy  
+
+The trained policy and model artifacts are saved as:
+
+```
+policy_bundle.pkl
+```
 
 ---
 
-# Generated Outputs
+### Step 3: Off-Policy Evaluation
 
-Running `crmab_modelling.py` produces several artifacts used in policy evaluation.
+Next, evaluate the learned treatment policy using historical patient trajectories.
 
-Important outputs include:
+Open and run:
 
-* **policy_bundle.pkl** – trained RMAB policy bundle
-* **q_models_fqe_strong.pkl** – fitted Q-evaluation models
-* **behavior_model_lgbm.pkl** – learned behavior policy model
-* **behavior_model_lgbm_statecols.pkl** – behavior model with feature ordering
-* **ope_crossfit_results.csv** – cross-fitted off-policy evaluation results
-* **ope_crossfit_summary.json** – summary statistics of policy performance
-* **policy_mix_selected_summary.json** – selected policy configuration
+```
+OPE_Testing.ipynb
+```
 
-These artifacts allow the evaluation pipeline to be reproduced without retraining models.
+This notebook performs off-policy evaluation using importance sampling based methods to estimate the expected value of the learned policy.
+
+The evaluation includes:
+
+- Weighted Importance Sampling (WIS)
+- Effective Sample Size (ESS)
+- bootstrap confidence intervals
+
+---
+
+### Step 4: Policy Refinement and Validation
+
+Finally, additional policy improvements and validation experiments can be performed using:
+
+```
+improved_rmab_policy.py
+```
+
+This script evaluates alternative policy configurations and compares the learned policy against the clinician policy under the off-policy evaluation framework.
+
+# Output Metrics
+
+The evaluation produces several metrics including:
+
+* estimated policy value
+* effective sample size (ESS)
+* trajectory-level diagnostics
+* bootstrap confidence intervals
+
+These metrics help assess the **stability and reliability of the learned treatment policy**.
 
 ---
 
